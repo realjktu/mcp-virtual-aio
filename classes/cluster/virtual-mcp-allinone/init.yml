@@ -1,0 +1,49 @@
+classes:
+- system.linux.system.single
+- service.mysql.server.single
+- system.memcached.server.single
+- system.rabbitmq.server.single
+- cluster.virtual-mcp-allinone.openstack
+parameters:
+  _param:
+    mysql_admin_user: root
+    mysql_admin_password: workshop
+    rabbitmq_secret_key: workshop
+    rabbitmq_admin_password: workshop
+  linux:
+    network:
+      bridge: openvswitch
+      interface:
+        br-floating:
+          enabled: true
+          type: ovs_bridge
+  mysql:
+    client:
+      enabled: true
+      server:
+        database:
+          admin:
+            encoding: utf8
+            host: localhost
+            password: ${_param:mysql_admin_password}
+            port: 3306
+            user: ${_param:mysql_admin_user}
+    server:
+      version: '5.6'
+  nova:
+    compute:
+      cache:
+        members:
+        - host: 127.0.0.1
+          port: 11211
+  rabbitmq:
+    server:
+      host:
+        'openstack':
+          enabled: true
+          user: openstack
+          password: ${_param:rabbitmq_openstack_password}
+          policies:
+          - name: HA
+            pattern: '^(?!amq\.).*'
+            definition: '{"ha-mode": "all", "message-ttl": 120000}'
