@@ -65,6 +65,11 @@ for formula_service in "${formula_services[@]}"; do
   cd -
 done
 
+Apply patches (check latest patchset):
+cd /root/formulas/nova
+git fetch https://gerrit.mcp.mirantis.net/salt-formulas/nova refs/changes/81/4381/5 && git checkout -b config FETCH_HEAD
+make install
+
 salt-call state.apply salt
 salt-call state.apply linux,ntp,openssh
 salt-call state.apply memcached
