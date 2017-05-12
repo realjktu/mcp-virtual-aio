@@ -81,6 +81,8 @@ salt-call state.apply neutron
 salt-call state.apply nova.controller
 salt-call state.apply nova.compute
 
+service nova-compute restart
+
 . /root/keystonercv3
 
 wget http://download.cirros-cloud.net/0.3.5/cirros-0.3.5-x86_64-disk.img
