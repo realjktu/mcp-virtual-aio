@@ -83,6 +83,15 @@ salt-call state.apply nova.compute
 
 service nova-compute restart
 
+fallocate -l 10G /lvm.img
+losetup /dev/loop0 /lvm.img
+echo -e '#!/bin/bash\nlosetup /dev/loop0 /lvm.img' > /etc/rc.local
+pvcreate /dev/loop0
+vgcreate cinder-volume /dev/loop0
+
+salt-call state.apply cinder
+
+
 . /root/keystonercv3
 
 wget http://download.cirros-cloud.net/0.3.5/cirros-0.3.5-x86_64-disk.img
@@ -94,3 +103,6 @@ neutron subnet-create test 192.168.1.0/24
 nova flavor-create m1.extra_tiny auto 256 0 1
 
 nova boot --flavor m1.extra_tiny --image cirros --nic net-id=d23f9845-cbce-47a6-be15-0603f6a31365 test # UUID of internal network
+
+cinder create --name test 1
+nova volume-attach test 49a471ec-2e6d-4810-9161-6c191e1370f5 # UUID of volume

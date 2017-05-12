@@ -36,6 +36,12 @@ parameters:
         members:
         - host: 127.0.0.1
           port: 11211
+  cinder:
+    volume:
+      cache:
+        members:
+        - host: 127.0.0.1
+          port: 11211
   rabbitmq:
     server:
       host:
