@@ -10,12 +10,14 @@ classes:
 - system.mysql.client.database.nova
 - system.mysql.client.database.nova_api
 - system.mysql.client.database.cinder
+- system.mysql.client.database.heat
 - system.keystone.client.single
 - system.keystone.client.service.nova
 - system.keystone.client.service.nova-placement
 - system.glance.control.single
 - system.nova.control.single
 - system.neutron.control.single
+- system.heat.server.single
 - system.nova.compute.single
 - service.neutron.gateway.single
 - system.cinder.control.single
@@ -35,6 +37,7 @@ parameters:
     nova_version: ${_param:openstack_version}
     neutron_version: ${_param:openstack_version}
     cinder_version: ${_param:openstack_version}
+    heat_version: ${_param:openstack_version}
     keystone_service_token: workshop
     keystone_admin_password: workshop
     keystone_ceilometer_password: workshop
@@ -49,6 +52,7 @@ parameters:
     mysql_nova_password: workshop
     mysql_neutron_password: workshop
     mysql_cinder_password: workshop
+    mysql_heat_password: workshop
     heat_service_host: ${_param:single_address}
     neutron_service_host: ${_param:single_address}
     glance_service_host: ${_param:single_address}
@@ -59,6 +63,7 @@ parameters:
     cluster_vip_address: ${_param:single_address}
     cluster_local_address: ${_param:single_address}
     tenant_address: ${_param:single_address}
+    heat_domain_admin_password: workshop
   keystone:
     server:
       tokens:
@@ -112,3 +117,7 @@ parameters:
     volume:
       cache:
         members: ~
+  heat:
+    server:
+      message_queue:
+        virtual_host: openstack

@@ -45,7 +45,7 @@ export FORMULAS_PATH=/root/formulas
 export FORMULAS_BRANCH=master
 
 mkdir -p ${FORMULAS_PATH}
-declare -a formula_services=("linux" "reclass" "salt" "openssh" "ntp" "git" "nginx" "collectd" "sensu" "heka" "sphinx" "mysql" "grafana" "libvirt" "rsyslog" "memcached" "rabbitmq" "apache" "keystone" "glance" "nova" "neutron")
+declare -a formula_services=("linux" "reclass" "salt" "openssh" "ntp" "git" "nginx" "collectd" "sensu" "heka" "sphinx" "mysql" "grafana" "libvirt" "rsyslog" "memcached" "rabbitmq" "apache" "keystone" "glance" "nova" "neutron" "cinder" "heat")
 for formula_service in "${formula_services[@]}"; do
   _BRANCH=${FORMULAS_BRANCH}
     [ ! -d "${FORMULAS_PATH}/${formula_service}" ] && {
@@ -90,6 +90,7 @@ pvcreate /dev/loop0
 vgcreate cinder-volume /dev/loop0
 
 salt-call state.apply cinder
+salt-call state.apply heat
 
 
 . /root/keystonercv3
