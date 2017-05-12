@@ -24,6 +24,7 @@ classes:
 - system.cinder.control.backend.lvm
 - service.cinder.volume.single
 - system.cinder.volume.backend.lvm
+- system.horizon.server.single
 parameters:
   _param:
     openstack_version: ocata
@@ -38,6 +39,7 @@ parameters:
     neutron_version: ${_param:openstack_version}
     cinder_version: ${_param:openstack_version}
     heat_version: ${_param:openstack_version}
+    horizon_version: ${_param:openstack_version}
     keystone_service_token: workshop
     keystone_admin_password: workshop
     keystone_ceilometer_password: workshop
@@ -64,6 +66,7 @@ parameters:
     cluster_local_address: ${_param:single_address}
     tenant_address: ${_param:single_address}
     heat_domain_admin_password: workshop
+    horizon_secret_key: workshop
   keystone:
     server:
       tokens:
@@ -121,3 +124,6 @@ parameters:
     server:
       message_queue:
         virtual_host: openstack
+  horizon:
+    server:
+      secure: False

@@ -45,7 +45,7 @@ export FORMULAS_PATH=/root/formulas
 export FORMULAS_BRANCH=master
 
 mkdir -p ${FORMULAS_PATH}
-declare -a formula_services=("linux" "reclass" "salt" "openssh" "ntp" "git" "nginx" "collectd" "sensu" "heka" "sphinx" "mysql" "grafana" "libvirt" "rsyslog" "memcached" "rabbitmq" "apache" "keystone" "glance" "nova" "neutron" "cinder" "heat")
+declare -a formula_services=("linux" "reclass" "salt" "openssh" "ntp" "git" "nginx" "collectd" "sensu" "heka" "sphinx" "mysql" "grafana" "libvirt" "rsyslog" "memcached" "rabbitmq" "apache" "keystone" "glance" "nova" "neutron" "cinder" "heat" "horizon")
 for formula_service in "${formula_services[@]}"; do
   _BRANCH=${FORMULAS_BRANCH}
     [ ! -d "${FORMULAS_PATH}/${formula_service}" ] && {
@@ -67,10 +67,14 @@ done
 
 Apply patches (check latest patchset):
 cd /root/formulas/nova
-git fetch https://gerrit.mcp.mirantis.net/salt-formulas/nova refs/changes/81/4381/5 && git checkout -b config FETCH_HEAD
+git fetch https://gerrit.mcp.mirantis.net/salt-formulas/nova refs/changes/81/4381/8 && git checkout -b config FETCH_HEAD
 make install
 
-salt-call state.apply salt
+fallocate -l 10G /lvm.img
+losetup /dev/loop0 /lvm.img
+echo -e '#!/bin/bash\nlosetup /dev/loop0 /lvm.img' > /etc/rc.local
+
+#salt-call state.apply salt
 salt-call state.apply linux,ntp,openssh
 salt-call state.apply memcached
 salt-call state.apply rabbitmq
@@ -79,18 +83,13 @@ salt-call state.apply keystone
 salt-call state.apply glance
 salt-call state.apply neutron
 salt-call state.apply nova.controller
+
 salt-call state.apply nova.compute
-
 service nova-compute restart
-
-fallocate -l 10G /lvm.img
-losetup /dev/loop0 /lvm.img
-echo -e '#!/bin/bash\nlosetup /dev/loop0 /lvm.img' > /etc/rc.local
-pvcreate /dev/loop0
-vgcreate cinder-volume /dev/loop0
 
 salt-call state.apply cinder
 salt-call state.apply heat
+salt-call state.apply horizon
 
 
 . /root/keystonercv3
@@ -107,3 +106,5 @@ nova boot --flavor m1.extra_tiny --image cirros --nic net-id=d23f9845-cbce-47a6-
 
 cinder create --name test 1
 nova volume-attach test 49a471ec-2e6d-4810-9161-6c191e1370f5 # UUID of volume
+
+# Horizon is available on port :8078
