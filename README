@@ -3,6 +3,8 @@ add-apt-repository http://repo.saltstack.com/apt/ubuntu/16.04/amd64/latest
 apt update
 apt install -y salt-master salt-minion reclass make
 
+sed -i '/^::1/ s/$/ all01/' /etc/hosts
+
 rm /etc/salt/minion_id
 rm -f /etc/salt/pki/minion/minion_master.pub
 echo "id: all01.local" > /etc/salt/minion
@@ -67,30 +69,34 @@ done
 
 Apply patches (check latest patchset):
 cd /root/formulas/nova
-git fetch https://gerrit.mcp.mirantis.net/salt-formulas/nova refs/changes/81/4381/8 && git checkout -b config FETCH_HEAD
+git fetch https://gerrit.mcp.mirantis.net/salt-formulas/nova refs/changes/13/4413/3 && git checkout -b compute FETCH_HEAD
 make install
 
 fallocate -l 10G /lvm.img
 losetup /dev/loop0 /lvm.img
 echo -e '#!/bin/bash\nlosetup /dev/loop0 /lvm.img' > /etc/rc.local
 
+systemctl mask nova-placement-api
+
+# Apply all
+salt-call state.apply # minimum two times or untill success
+
+# or apply one by one (when fail on some step - repeat or ignore):
 #salt-call state.apply salt
-salt-call state.apply linux,ntp,openssh
-salt-call state.apply memcached
-salt-call state.apply rabbitmq
-salt-call state.apply mysql
-salt-call state.apply keystone
-salt-call state.apply glance
-salt-call state.apply neutron
-salt-call state.apply nova.controller
+#salt-call state.apply linux,ntp,openssh
+#salt-call state.apply memcached
+#salt-call state.apply rabbitmq
+#salt-call state.apply mysql
+#salt-call state.apply keystone
+#salt-call state.apply glance
+#salt-call state.apply neutron
+#salt-call state.apply nova.controller
+#salt-call state.apply nova.compute
+#salt-call state.apply cinder
+#salt-call state.apply heat
+#salt-call state.apply horizon
 
-salt-call state.apply nova.compute
-service nova-compute restart
-
-salt-call state.apply cinder
-salt-call state.apply heat
-salt-call state.apply horizon
-
+service nova* restart
 
 . /root/keystonercv3
 
