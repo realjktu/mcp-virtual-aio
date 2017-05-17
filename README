@@ -67,11 +67,6 @@ for formula_service in "${formula_services[@]}"; do
   cd -
 done
 
-Apply patches (check latest patchset):
-cd /root/formulas/nova
-git fetch https://gerrit.mcp.mirantis.net/salt-formulas/nova refs/changes/13/4413/3 && git checkout -b compute FETCH_HEAD
-make install
-
 fallocate -l 10G /lvm.img
 losetup /dev/loop0 /lvm.img
 echo -e '#!/bin/bash\nlosetup /dev/loop0 /lvm.img' > /etc/rc.local
@@ -79,7 +74,7 @@ echo -e '#!/bin/bash\nlosetup /dev/loop0 /lvm.img' > /etc/rc.local
 systemctl mask nova-placement-api
 
 # Apply all
-salt-call state.apply # minimum two times or untill success
+salt-call state.apply # minimum two times or until success
 
 # or apply one by one (when fail on some step - repeat or ignore):
 #salt-call state.apply salt
