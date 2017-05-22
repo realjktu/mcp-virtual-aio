@@ -12,11 +12,11 @@ classes:
 - system.mysql.client.database.cinder
 - system.mysql.client.database.heat
 - system.keystone.client.single
-- system.keystone.client.service.nova
+- system.keystone.client.service.nova21
 - system.keystone.client.service.nova-placement
 - system.glance.control.single
 - system.nova.control.single
-- system.neutron.control.single
+- system.neutron.control.openvswitch.single
 - system.heat.server.single
 - system.nova.compute.single
 - service.neutron.gateway.single
@@ -64,66 +64,28 @@ parameters:
     metadata_password: workshop
     cluster_vip_address: ${_param:single_address}
     cluster_local_address: ${_param:single_address}
+    openstack_database_address: ${_param:single_address}
     tenant_address: ${_param:single_address}
     heat_domain_admin_password: workshop
     horizon_secret_key: workshop
-  keystone:
-    server:
-      tokens:
-        engine: fernet
-      message_queue:
-        virtual_host: openstack
   neutron:
     server:
-      backend:
-        engine: ml2
-        tenant_network_types: "flat,vxlan"
-        mechanism:
-          ovs:
-            driver: openvswitch
       message_queue:
-        virtual_host: openstack
+        members: ~
     gateway:
-      message_queue:
-        host: ${_param:single_address}
-      metadata:
-        host: ${_param:single_address}
-        password: workshop
-      local_ip: ${_param:single_address}
       agent_mode: legacy
   nova:
-    controller:
-      version: ${_param:nova_version}
-      metadata:
-        password: workshop
-      message_queue:
-        virtual_host: openstack
     compute:
       network:
-        region: ${_param:openstack_region}
         user: neutron
         password: ${_param:keystone_neutron_password}
         tenant: service
       cache:
         members: ~
-  glance:
-    server:
-      message_queue:
-        virtual_host: openstack
-  rabbitmq:
-    server:
-      host: ~
   cinder:
-    controller:
-      message_queue:
-        virtual_host: openstack
     volume:
       cache:
         members: ~
-  heat:
-    server:
-      message_queue:
-        virtual_host: openstack
   horizon:
     server:
       secure: False

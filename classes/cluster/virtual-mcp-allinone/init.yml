@@ -1,6 +1,7 @@
 classes:
 - system.linux.system.single
 - service.mysql.server.single
+- system.mysql.client
 - system.memcached.server.single
 - system.rabbitmq.server.single
 - cluster.virtual-mcp-allinone.openstack
@@ -18,18 +19,9 @@ parameters:
           enabled: true
           type: ovs_bridge
   mysql:
-    client:
-      enabled: true
-      server:
-        database:
-          admin:
-            encoding: utf8
-            host: localhost
-            password: ${_param:mysql_admin_password}
-            port: 3306
-            user: ${_param:mysql_admin_user}
     server:
       version: '5.6'
+# override on this level
   nova:
     compute:
       cache:
@@ -42,14 +34,8 @@ parameters:
         members:
         - host: 127.0.0.1
           port: 11211
-  rabbitmq:
+  neutron:
     server:
-      host:
-        'openstack':
-          enabled: true
-          user: openstack
-          password: ${_param:rabbitmq_openstack_password}
-          policies:
-          - name: HA
-            pattern: '^(?!amq\.).*'
-            definition: '{"ha-mode": "all", "message-ttl": 120000}'
+      message_queue:
+        members:
+          - host: ${_param:single_address}

@@ -71,8 +71,6 @@ fallocate -l 10G /lvm.img
 losetup /dev/loop0 /lvm.img
 echo -e '#!/bin/bash\nlosetup /dev/loop0 /lvm.img' > /etc/rc.local
 
-systemctl mask nova-placement-api
-
 # Apply all
 salt-call state.apply # minimum two times or until success
 
