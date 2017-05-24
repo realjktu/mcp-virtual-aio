@@ -21,6 +21,7 @@ parameters:
   mysql:
     server:
       version: '5.6'
+      max_connections: 20000
 # override on this level
   nova:
     compute:
