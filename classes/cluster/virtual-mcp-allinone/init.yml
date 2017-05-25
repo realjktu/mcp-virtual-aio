@@ -1,5 +1,6 @@
 classes:
 - system.linux.system.single
+- system.linux.storage.loopback
 - service.mysql.server.single
 - system.mysql.client
 - system.memcached.server.single
@@ -11,6 +12,7 @@ parameters:
     mysql_admin_password: workshop
     rabbitmq_secret_key: workshop
     rabbitmq_admin_password: workshop
+    loopback_device_size: 10
   linux:
     network:
       bridge: openvswitch

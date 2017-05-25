@@ -3,8 +3,6 @@ add-apt-repository http://repo.saltstack.com/apt/ubuntu/16.04/amd64/latest
 apt update
 apt install -y salt-master salt-minion reclass make
 
-sed -i '/^::1/ s/$/ all01/' /etc/hosts
-
 rm /etc/salt/minion_id
 rm -f /etc/salt/pki/minion/minion_master.pub
 echo "id: all01.local" > /etc/salt/minion
@@ -66,10 +64,6 @@ for formula_service in "${formula_services[@]}"; do
   make install
   cd -
 done
-
-fallocate -l 10G /lvm.img
-losetup /dev/loop0 /lvm.img
-echo -e '#!/bin/bash\nlosetup /dev/loop0 /lvm.img' > /etc/rc.local
 
 # Apply all
 salt-call state.apply # minimum two times or until success
