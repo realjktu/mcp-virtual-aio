@@ -45,7 +45,7 @@ export FORMULAS_PATH=/root/formulas
 export FORMULAS_BRANCH=master
 
 mkdir -p ${FORMULAS_PATH}
-declare -a formula_services=("linux" "reclass" "salt" "openssh" "ntp" "git" "nginx" "collectd" "sensu" "heka" "sphinx" "mysql" "grafana" "libvirt" "rsyslog" "memcached" "rabbitmq" "apache" "keystone" "glance" "nova" "neutron" "cinder" "heat" "horizon")
+declare -a formula_services=("linux" "reclass" "salt" "openssh" "ntp" "git" "nginx" "collectd" "sensu" "heka" "sphinx" "mysql" "grafana" "libvirt" "rsyslog" "memcached" "rabbitmq" "apache" "keystone" "glance" "nova" "neutron" "cinder" "heat" "horizon" "ironic" "tftpd-hpa")
 for formula_service in "${formula_services[@]}"; do
   _BRANCH=${FORMULAS_BRANCH}
     [ ! -d "${FORMULAS_PATH}/${formula_service}" ] && {
@@ -82,6 +82,9 @@ salt-call state.apply # minimum two times or until success
 #salt-call state.apply cinder
 #salt-call state.apply heat
 #salt-call state.apply horizon
+# Ironic is not available yet.
+#salt-call state.apply ironic
+#salt-call state.apply tftpd_hpa
 
 service nova* restart
 
