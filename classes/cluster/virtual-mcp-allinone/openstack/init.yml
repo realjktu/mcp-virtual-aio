@@ -78,6 +78,8 @@ parameters:
     tenant_address: ${_param:single_address}
     heat_domain_admin_password: workshop
     horizon_secret_key: workshop
+    horizon_identity_encryption: none
+    horizon_identity_version: 2
   neutron:
     server:
       message_queue:
