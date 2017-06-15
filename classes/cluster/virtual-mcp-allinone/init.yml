@@ -14,7 +14,16 @@ parameters:
     rabbitmq_admin_password: workshop
     loopback_device_size: 10
     primary_interface: ens3
+  openssh:
+    server:
+      password_auth: true
   linux:
+    system:
+      user:
+        root:
+          enabled: true
+          # r00tme
+          password: $6$9ojWyyN.$26Vj46JtCUL6C7XBQ8RmQTZLwo8/8SkqTRElXh0X2YBLrt7E/aVe2AYQ5gguYUwUknZNOSn5q7M9M3Jyf2gof/
     network:
       bridge: openvswitch
       interface:
