@@ -16,6 +16,7 @@ parameters:
   openssh:
     server:
       password_auth: true
+      permit_root_login: true
   linux:
     system:
       user:
