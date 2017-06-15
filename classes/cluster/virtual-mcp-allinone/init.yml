@@ -13,13 +13,31 @@ parameters:
     rabbitmq_secret_key: workshop
     rabbitmq_admin_password: workshop
     loopback_device_size: 10
+    primary_interface: ens3
   linux:
     network:
       bridge: openvswitch
       interface:
+        primary_int:
+          enabled: true
+          name: ${_param:primary_interface}
+          proto: manual
+          type: eth
         br-floating:
           enabled: true
           type: ovs_bridge
+        float-to-br:
+          enabled: true
+          type: ovs_port
+          bridge: br-floating
+        br-single:
+          enabled: true
+          type: bridge
+          proto: dhcp
+          use_interfaces:
+          - ${_param:primary_interface}
+          use_ovs_ports:
+          - float-to-br
   mysql:
     server:
       version: '5.6'
