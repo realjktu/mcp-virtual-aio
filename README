@@ -77,8 +77,7 @@ salt-call state.apply # minimum two times or until success
 #salt-call state.apply keystone
 #salt-call state.apply glance
 #salt-call state.apply neutron
-#salt-call state.apply nova.controller
-#salt-call state.apply nova.compute
+#salt-call state.apply nova
 #salt-call state.apply cinder
 #salt-call state.apply heat
 #salt-call state.apply horizon
@@ -93,12 +92,25 @@ service nova* restart
 wget http://download.cirros-cloud.net/0.3.5/cirros-0.3.5-x86_64-disk.img
 glance image-create --name cirros --visibility public --disk-format qcow2 --container-format bare --file cirros-0.3.5-x86_64-disk.img --progress
 
-neutron net-create test
-neutron subnet-create test 192.168.1.0/24
+neutron net-create internal_net
+neutron subnet-create --name internal_subnet internal_net 192.168.1.0/24
+
+neutron net-create external_network --provider:network_type flat --provider:physical_network physnet1 --router:external
+neutron subnet-create --name external_subnet --enable_dhcp=False --allocation-pool=start=172.16.1.2,end=172.16.1.250 --gateway=172.16.1.1 external_network 172.16.1.0/24
+
+neutron router-create r1
+neutron router-interface-add r1 internal_subnet
+neutron router-gateway-set r1 external_network
+
+nova secgroup-add-rule default icmp -1 -1 0.0.0.0/0
+nova secgroup-add-rule default tcp 1 65535 0.0.0.0/0
 
 nova flavor-create m1.extra_tiny auto 256 0 1
 
 nova boot --flavor m1.extra_tiny --image cirros --nic net-id=d23f9845-cbce-47a6-be15-0603f6a31365 test # UUID of internal network
+
+nova floating-ip-create external_network
+nova floating-ip-associate test 172.16.1.7 # floating IP
 
 cinder create --name test 1
 nova volume-attach test 49a471ec-2e6d-4810-9161-6c191e1370f5 # UUID of volume
