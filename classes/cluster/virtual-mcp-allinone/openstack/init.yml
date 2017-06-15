@@ -85,7 +85,8 @@ parameters:
       message_queue:
         members: ~
     gateway:
-      agent_mode: legacy
+      agent_mode: dvr_snat
+      dvr: True
   nova:
     compute:
       network:
