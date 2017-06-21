@@ -12,10 +12,13 @@ classes:
 - system.mysql.client.database.cinder
 - system.mysql.client.database.heat
 #- system.mysql.client.database.ironic
+- system.mysql.client.database.designate
+- system.mysql.client.database.designate_pool_manager
 - system.keystone.client.single
 - system.keystone.client.service.nova21
 - system.keystone.client.service.nova-placement
 #- system.keystone.client.service.ironic
+- system.keystone.client.service.designate
 - system.glance.control.single
 - system.nova.control.single
 - system.neutron.control.openvswitch.single
@@ -27,6 +30,9 @@ classes:
 - service.cinder.volume.single
 - system.cinder.volume.backend.lvm
 - system.horizon.server.single
+- system.bind.server.single
+- system.designate.server.single
+- system.designate.server.backend.bind
 #- system.ironic.api.single
 #- system.ironic.conductor.single
 #- system.ironic.tftpd_hpa
@@ -47,6 +53,7 @@ parameters:
     heat_version: ${_param:openstack_version}
     horizon_version: ${_param:openstack_version}
     ironic_version: ${_param:openstack_version}
+    designate_version: ${_param:openstack_version}
     keystone_service_token: workshop
     keystone_admin_password: workshop
     keystone_ceilometer_password: workshop
@@ -55,6 +62,7 @@ parameters:
     keystone_heat_password: workshop
     keystone_neutron_password: workshop
     keystone_nova_password: workshop
+    keystone_designate_password: workshop
     keystone_ironic_password: workshop
     keystone_service_host: ${_param:single_address}
     mysql_keystone_password: workshop
@@ -64,10 +72,12 @@ parameters:
     mysql_cinder_password: workshop
     mysql_heat_password: workshop
     mysql_ironic_password: workshop
+    mysql_designate_password: workshop
     heat_service_host: ${_param:single_address}
     neutron_service_host: ${_param:single_address}
     glance_service_host: ${_param:single_address}
     cinder_service_host: ${_param:single_address}
+    designate_service_host: ${_param:single_address}
     nova_service_host: ${_param:single_address}
     ironic_service_host: ${_param:single_address}
     control_address: ${_param:single_address}
@@ -80,6 +90,24 @@ parameters:
     horizon_secret_key: workshop
     horizon_identity_encryption: none
     horizon_identity_version: 2
+    designate_bind9_rndc_key: 4pc+X4PDqb2q+5o72dISm72LM1Ds9X2EYZjqg+nmsS7FhdTwzFFY8l/iEDmHxnyjkA33EQC8H+z0fLLBunoitw==
+    designate_domain_id: 5186883b-91fb-4891-bd49-e6769234a8fc
+    designate_pool_ns_records:
+      - hostname: 'ns1.example.org.'
+        priority: 10
+    designate_pool_nameservers:
+      - host: ${_param:single_address}
+        port: 53
+    designate_pool_target_type: bind9
+    designate_pool_target_masters:
+      - host: ${_param:single_address}
+        port: 5354
+    designate_pool_target_options:
+      host: ${_param:single_address}
+      port: 53
+      rndc_host: 127.0.0.1
+      rndc_port: 953
+      rndc_key_file: /etc/designate/rndc.key
   neutron:
     server:
       message_queue:

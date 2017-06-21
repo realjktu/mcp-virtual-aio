@@ -45,7 +45,7 @@ export FORMULAS_PATH=/root/formulas
 export FORMULAS_BRANCH=master
 
 mkdir -p ${FORMULAS_PATH}
-declare -a formula_services=("linux" "reclass" "salt" "openssh" "ntp" "git" "nginx" "collectd" "sensu" "heka" "sphinx" "mysql" "grafana" "libvirt" "rsyslog" "memcached" "rabbitmq" "apache" "keystone" "glance" "nova" "neutron" "cinder" "heat" "horizon" "ironic" "tftpd-hpa")
+declare -a formula_services=("linux" "reclass" "salt" "openssh" "ntp" "git" "nginx" "collectd" "sensu" "heka" "sphinx" "mysql" "grafana" "libvirt" "rsyslog" "memcached" "rabbitmq" "apache" "keystone" "glance" "nova" "neutron" "cinder" "heat" "horizon" "ironic" "tftpd-hpa" "bind" "powerdns" "designate")
 for formula_service in "${formula_services[@]}"; do
   _BRANCH=${FORMULAS_BRANCH}
     [ ! -d "${FORMULAS_PATH}/${formula_service}" ] && {
@@ -81,6 +81,8 @@ salt-call state.apply # minimum two times or until success
 #salt-call state.apply cinder
 #salt-call state.apply heat
 #salt-call state.apply horizon
+#salt-call state.apply bind
+#salt-call state.apply designate
 # Ironic is not available yet.
 #salt-call state.apply ironic
 #salt-call state.apply tftpd_hpa
@@ -114,5 +116,10 @@ nova floating-ip-associate test 172.16.1.7 # floating IP
 
 cinder create --name test 1
 nova volume-attach test 49a471ec-2e6d-4810-9161-6c191e1370f5 # UUID of volume
+
+openstack dns service list
+openstack zone create --email dnsmaster@example.tld example.tld.
+openstack recordset create --records '10.0.0.1' --type A example.tld. www
+nslookup www.example.tld 127.0.0.1
 
 # Horizon is available on port :8078
