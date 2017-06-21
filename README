@@ -85,7 +85,7 @@ salt-call state.apply # minimum two times or until success
 #salt-call state.apply ironic
 #salt-call state.apply tftpd_hpa
 
-service nova* restart
+service apache2 restart
 
 . /root/keystonercv3
 
