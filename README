@@ -65,6 +65,26 @@ for formula_service in "${formula_services[@]}"; do
   cd -
 done
 
+# In case Designate should be deployed with PowerDNS backend, change designate_backend.yml:
+cat <<-'EOF' > classes/cluster/designate_backend.yml
+classes:
+- system.designate.server.backend.pdns
+parameters:
+  _param:
+    designate_pool_target_type: pdns4
+    powerdns_webserver_password: gJ6n3gVaYP8eS
+    powerdns_webserver_port: 8081
+    designate_pdns_api_key: VxK9cMlFL5Ae
+    designate_pdns_api_endpoint: "http://${_param:single_address}:${_param:powerdns_webserver_port}"
+    designate_pool_target_options:
+      api_endpoint: ${_param:designate_pdns_api_endpoint}
+      api_token: ${_param:designate_pdns_api_key}
+  powerdns:
+    server:
+      axfr_ips:
+        - ${_param:single_address}
+EOF
+
 # Apply all
 salt-call state.apply # minimum two times or until success
 
@@ -81,7 +101,13 @@ salt-call state.apply # minimum two times or until success
 #salt-call state.apply cinder
 #salt-call state.apply heat
 #salt-call state.apply horizon
+
+#If Powerdns Designate backend:
+#salt-call state.apply powerdns
+
+#If Bind9 Designate backend:
 #salt-call state.apply bind
+
 #salt-call state.apply designate
 # Ironic is not available yet.
 #salt-call state.apply ironic
