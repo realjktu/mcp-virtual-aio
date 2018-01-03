@@ -120,4 +120,4 @@ parameters:
       server:
         admin_identity:
           admin:
-            api_version: 3
+            api_version: ""
