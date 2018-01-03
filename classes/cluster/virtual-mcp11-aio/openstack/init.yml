@@ -115,3 +115,9 @@ parameters:
   horizon:
     server:
       secure: False
+  keystone:
+    client:
+      server:
+        admin_identity:
+          admin:
+            api_version: 3
