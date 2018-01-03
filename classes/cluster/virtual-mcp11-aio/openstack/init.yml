@@ -179,3 +179,9 @@ parameters:
     server:
       barbican:
         enabled: ${_param:barbican_integration_enabled}
+  keystone:
+    client:
+      server:
+        admin_identity:
+          admin:
+            api_version: 3
