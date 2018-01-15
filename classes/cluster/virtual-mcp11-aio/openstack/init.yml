@@ -83,6 +83,8 @@ parameters:
     openstack_public_neutron_subnet_cidr: 192.168.130.0/24
     openstack_public_neutron_subnet_allocation_start: 192.168.130.10
     openstack_public_neutron_subnet_allocation_end: 192.168.130.254
+    runtest_tempest_cfg_dir: /root/rally_reports/
+    runtest_tempest_cfg_name: tempest_generated.conf
   galera:
     master:
       members: ~
@@ -115,3 +117,9 @@ parameters:
   horizon:
     server:
       secure: False
+  runtest:
+    enabled: True
+    tempest:
+      enabled: True
+      cfg_dir: ${_param:runtest_tempest_cfg_dir}
+      cfg_name: ${_param:runtest_tempest_cfg_name}
