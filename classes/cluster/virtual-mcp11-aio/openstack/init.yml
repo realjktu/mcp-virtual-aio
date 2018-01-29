@@ -26,10 +26,9 @@ classes:
 - service.cinder.volume.single
 - system.cinder.volume.backend.lvm
 - system.horizon.server.single
-- system.bind.server.single
 parameters:
   _param:
-    openstack_version: mitaka
+    openstack_version: newton
     cluster_public_host: ${_param:single_address}
     cluster_public_protocol: http
     openstack_region: RegionOne
@@ -128,7 +127,7 @@ parameters:
       compute:
         build_timeout: 600
         min_microversion: 2.1
-        max_microversion: 2.25
+        max_microversion: 2.38
       orchestration:
         max_template_size: 5440000
         max_resources_per_stack: 20000
