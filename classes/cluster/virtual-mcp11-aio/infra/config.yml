@@ -8,3 +8,17 @@ parameters:
       name: cfg01
       domain: ${_param:cluster_domain}
       purge_repos: ${_param:linux_system_purge_repos}
+  salt:
+    master:
+      worker_threads: 5
+      environment:
+        prd:
+          formula:
+            runtest:
+              source: git
+              address: 'https://gerrit.mcp.mirantis.net/salt-formulas/runtest'
+              revision: master
+              module:
+                runtest: runtest
+              state:
+                runtest.py: runtest.py
