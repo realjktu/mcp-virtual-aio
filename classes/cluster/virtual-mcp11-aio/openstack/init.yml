@@ -1,11 +1,15 @@
 classes:
+- system.salt.minion.cert.mysql.server
+- system.salt.minion.cert.rabbitmq_server
 - system.linux.system.lowmem
 - system.linux.system.repo.mcp.openstack
 - system.linux.system.repo.mcp.extra
 - system.linux.storage.loopback
+- service.rabbitmq.server.ssl
 - system.rabbitmq.server.vhost.openstack
 - system.keystone.server.wsgi
 - system.keystone.server.single
+- service.galera.ssl
 - service.galera.master.cluster
 - system.galera.server.database.cinder
 - system.galera.server.database.designate
@@ -16,6 +20,7 @@ classes:
 - system.galera.server.database.barbican
 - system.keystone.client.single
 - system.keystone.client.service.barbican
+- system.keystone.client.service.cinder3
 - system.keystone.client.service.nova21
 - system.keystone.client.service.nova-placement
 - system.keystone.client.service.designate
@@ -38,7 +43,7 @@ classes:
 - system.designate.server.backend.bind
 parameters:
   _param:
-    openstack_version: ocata
+    openstack_version: pike
     cluster_public_host: ${_param:single_address}
     cluster_public_protocol: http
     openstack_region: RegionOne
@@ -123,6 +128,9 @@ parameters:
     openstack_public_neutron_subnet_allocation_end: 192.168.130.254
     barbican_simple_crypto_kek: YWJjZGVmZ2hpamtsbW5vcHFyc3R1dnd4eXoxMjM0NTY=
     barbican_integration_enabled: False
+    galera_ssl_enabled: false # until stable has https://github.com/salt-formulas/salt-formula-galera/commit/d5d0984b80e32bc56a4d0280b232e40e854723ac#diff-5ff514b7d44d308b94bddee0f01932bc
+    rabbitmq_ssl_enabled: false # until stable has https://github.com/salt-formulas/salt-formula-cinder/commit/929398265f0a71fbd6fa4e2d7dc81c4720bdde59
+    rabbitmq_port: 5672 # for non-ssl use 5672/for ssl 5671
     runtest_tempest_cfg_dir: /root/rally_reports/
     runtest_tempest_cfg_name: tempest_generated.conf
   galera:
@@ -140,13 +148,35 @@ parameters:
           crypto_plugin: simple_crypto
           store_plugin: store_crypto
           global_default: True
+      database:
+        ssl:
+          enabled: ${_param:galera_ssl_enabled}
+      message_queue:
+        port: ${_param:rabbitmq_port}
+        ssl:
+          enabled: ${_param:rabbitmq_ssl_enabled}
   neutron:
     server:
+      api_workers: 2
+      rpc_state_report_workers: 2
+      rpc_workers: 2
       message_queue:
         members: ~
+        port: ${_param:rabbitmq_port}
+        ssl:
+          enabled: ${_param:rabbitmq_ssl_enabled}
+      database:
+        ssl:
+          enabled: ${_param:galera_ssl_enabled}
     gateway:
+      metadata:
+        workers: 2
       agent_mode: dvr_snat
       dvr: True
+      message_queue:
+        port: ${_param:rabbitmq_port}
+        ssl:
+          enabled: ${_param:rabbitmq_ssl_enabled}
   nova:
     compute:
       barbican:
@@ -158,17 +188,42 @@ parameters:
         tenant: service
       cache:
         members: ~
+      message_queue:
+        port: ${_param:rabbitmq_port}
+        ssl:
+          enabled: ${_param:rabbitmq_ssl_enabled}
     controller:
       barbican:
         enabled: ${_param:barbican_integration_enabled}
       vncproxy_url: http://${_param:single_address}:6080
+      database:
+        ssl:
+          enabled: ${_param:galera_ssl_enabled}
+      message_queue:
+        port: ${_param:rabbitmq_port}
+        ssl:
+          enabled: ${_param:rabbitmq_ssl_enabled}
   cinder:
     controller:
       barbican:
         enabled: ${_param:barbican_integration_enabled}
+      database:
+        ssl:
+          enabled: ${_param:galera_ssl_enabled}
+      message_queue:
+        port: ${_param:rabbitmq_port}
+        ssl:
+          enabled: ${_param:rabbitmq_ssl_enabled}
     volume:
       cache:
         members: ~
+      database:
+        ssl:
+          enabled: ${_param:galera_ssl_enabled}
+      message_queue:
+        port: ${_param:rabbitmq_port}
+        ssl:
+          enabled: ${_param:rabbitmq_ssl_enabled}
   horizon:
     server:
       secure: False
@@ -176,12 +231,44 @@ parameters:
     server:
       quota:
         zones: ${_param:designate_quota_zones}
+      database:
+        ssl:
+          enabled: ${_param:galera_ssl_enabled}
+      message_queue:
+        port: ${_param:rabbitmq_port}
+        ssl:
+          enabled: ${_param:rabbitmq_ssl_enabled}
     worker:
       enabled: ${_param:designate_worker_enabled}
   glance:
     server:
       barbican:
         enabled: ${_param:barbican_integration_enabled}
+      database:
+        ssl:
+          enabled: ${_param:galera_ssl_enabled}
+      message_queue:
+        port: ${_param:rabbitmq_port}
+        ssl:
+          enabled: ${_param:rabbitmq_ssl_enabled}
+  keystone:
+    server:
+      database:
+        ssl:
+          enabled: ${_param:galera_ssl_enabled}
+      message_queue:
+        port: ${_param:rabbitmq_port}
+        ssl:
+          enabled: ${_param:rabbitmq_ssl_enabled}
+  heat:
+    server:
+      database:
+        ssl:
+          enabled: ${_param:galera_ssl_enabled}
+      message_queue:
+        port: ${_param:rabbitmq_port}
+        ssl:
+          enabled: ${_param:rabbitmq_ssl_enabled}
   runtest:
     enabled: True
     tempest:
@@ -193,7 +280,7 @@ parameters:
       compute:
         build_timeout: 600
         min_microversion: 2.1
-        max_microversion: 2.42
+        max_microversion: 2.53
       orchestration:
         max_template_size: 5440000
         max_resources_per_stack: 20000

@@ -58,6 +58,10 @@ parameters:
           - pin: ${_param:linux_system_repo_pin}
             priority: ${_param:linux_system_repo_priority}
             package: '*'
+        # workaround for PROD-15657, mysql 5.7 isn't built, using 5.6 instead
+          - pin: 'version 5.6*'
+            priority: 1300
+            package: 'mysql-client'
     network:
       bridge: openvswitch
       interface:
