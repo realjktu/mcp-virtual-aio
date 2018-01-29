@@ -71,6 +71,16 @@ parameters:
           proto: static
           address: ${_param:openstack_public_neutron_subnet_gateway}
           netmask: 255.255.255.0
+        ens4:
+          enabled: true
+          type: eth
+          proto: static
+          address: ${_param:single_address}
+          netmask: 255.255.255.0
+        ens3:
+          enabled: true
+          type: eth
+          proto: dhcp
 # override on this level
   nova:
     compute:
