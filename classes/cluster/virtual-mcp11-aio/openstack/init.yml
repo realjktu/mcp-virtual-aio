@@ -301,4 +301,3 @@ parameters:
         admin_identity:
           admin:
             api_version: ""
-
