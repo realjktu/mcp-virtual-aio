@@ -22,15 +22,3 @@ parameters:
                 runtest: runtest
               state:
                 runtest.py: runtest.py
-            keystone:
-              source: git
-              address: 'https://gerrit.mcp.mirantis.net/salt-formulas/keystone'
-              revision: master
-              module:
-                keystoneng.py: keystoneng.py
-                keystone_policy.py: keystone_policy.py
-              state:
-                keystoneng.py: keystoneng.py
-                keystone_policy.py: keystone_policy.py
-              grain:
-                keystone_policy.py: keystone_policy.py
